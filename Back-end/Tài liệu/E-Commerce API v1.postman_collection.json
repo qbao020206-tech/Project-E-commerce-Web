@@ -1,0 +1,685 @@
+{
+  "info": {
+    "_postman_id": "a1956efe-92d7-4af1-898f-6de56040e56b",
+    "name": "E-Commerce API v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "55555448",
+    "_collection_link": "https://go.postman.co/collection/55555448-a1956efe-92d7-4af1-898f-6de56040e56b?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Roles Management",
+      "item": [
+        {
+          "name": "Get list Role",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{mock_url}}/api/v1/roles",
+              "host": [
+                "{{mock_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "roles"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Get list Role",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{mock_url}}/api/v1/roles",
+                  "host": [
+                    "{{mock_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "roles"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\r\n    \"status\": \"success\",\r\n    \"message\": \"Lấy danh sách vai trò thành công\",\r\n    \"data\": [\r\n        {\r\n            \"role_id\": 1,\r\n            \"role_code\": \"CUSTOMER\",\r\n            \"role_name\": \"Người mua\"\r\n        },\r\n        {\r\n            \"role_id\": 2,\r\n            \"role_code\": \"SELLER\",\r\n            \"role_name\": \"Người bán\"\r\n        },\r\n        {\r\n            \"role_id\": 3,\r\n            \"role_code\": \"ADMIN\",\r\n            \"role_name\": \"Admin\"\r\n        },\r\n        {\r\n            \"role_id\": 4,\r\n            \"role_code\": \"SHIPPER\",\r\n            \"role_name\": \"Vận chuyển\"\r\n        }\r\n    ]\r\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"quocbao@gmail.com\",\r\n    \"password\": \"hellotechtonic-2026\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{mock_url}}/api/v1/auth/login",
+              "host": [
+                "{{mock_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Login",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"quocbao@gmail.com\",\r\n    \"password\": \"mat_khau_sieu_bao_mat\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{mock_url}}/api/v1/auth/login",
+                  "host": [
+                    "{{mock_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\r\n    \"status\": \"success\",\r\n    \"message\": \"Đăng nhập thành công\",\r\n    \"data\": {\r\n        \"user_id\": 1,\r\n        \"full_name\": \"Nguyễn Quốc Bảo\",\r\n        \"email\": \"quocbao@gmail.com\",\r\n        \"role\": \"ADMIN\"\r\n    },\r\n    \"tokens\": {\r\n        \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vy... (chuỗi vòng tay ngắn hạn)\",\r\n        \"refreshToken\": \"def456... (chuỗi vòng tay dài hạn)\"\r\n    }\r\n}"
+            }
+          ]
+        },
+        {
+          "name": "Reginster",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"khachhang_moi@gmail.com\",\r\n    \"password\": \"matkhaukhodoan_123\",\r\n    \"full_name\": \"Khách Hàng Mới\",\r\n    \"phone\": \"0901234567\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{mock_url}}/api/v1/auth/register",
+              "host": [
+                "{{mock_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Reginster",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"khachhang_moi@gmail.com\",\r\n    \"password\": \"matkhaukhodoan_123\",\r\n    \"full_name\": \"Khách Hàng Mới\",\r\n    \"phone\": \"0901234567\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{mock_url}}/api/v1/auth/register",
+                  "host": [
+                    "{{mock_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "register"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\r\n    \"status\": \"success\",\r\n    \"message\": \"Đăng ký tài khoản thành công. Vui lòng đăng nhập.\",\r\n    \"data\": {\r\n        \"user_id\": 2,\r\n        \"email\": \"khachhang_moi@gmail.com\",\r\n        \"full_name\": \"Khách Hàng Mới\",\r\n        \"status\": \"ACTIVE\"\r\n    }\r\n}"
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-mock-match-request-body",
+                "value": "False",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"refreshToken\": \"chuoi_refresh_token_moi_khach_hang_def456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{mock_url}}/api/v1/auth/refresh-token",
+              "host": [
+                "{{mock_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "refresh-token"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Refresh Token",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-mock-match-request-body",
+                    "value": "False",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"refreshToken\": \"chuoi_refresh_token_moi_khach_hang_def456\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{mock_url}}/api/v1/auth/refresh-token",
+                  "host": [
+                    "{{mock_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "refresh-token"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"Cấp lại token thành công\",\n    \"data\": {\n        \"tokens\": {\n            \"accessToken\": \"eyJhbGciOi... (đây là chuỗi vòng tay ngắn hạn MỚI)\",\n            \"refreshToken\": \"xyz987... (đây là chuỗi vòng tay dài hạn MỚI)\"\n        }\n    }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Products Management",
+      "item": [
+        {
+          "name": "Get list Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{mock_url}}/api/v1/products?page=1&limit=10",
+              "host": [
+                "{{mock_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Get list Products",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{mock_url}}/api/v1/products?page=1&limit=10",
+                  "host": [
+                    "{{mock_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "products"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"Lấy danh sách sản phẩm thành công\",\n    \"data\": {\n        \"items\": [\n            {\n                \"product_id\": 101,\n                \"product_name\": \"Laptop Lenovo ThinkPad T14\",\n                \"price\": 25000000,\n                \"stock_quantity\": 50,\n                \"image_url\": \"https://picsum.photos/200/300\"\n            },\n            {\n                \"product_id\": 102,\n                \"product_name\": \"Chuột không dây Logitech\",\n                \"price\": 500000,\n                \"stock_quantity\": 200,\n                \"image_url\": \"https://picsum.photos/200/301\"\n            }\n        ],\n        \"meta\": {\n            \"current_page\": 1,\n            \"items_per_page\": 10,\n            \"total_items\": 150,\n            \"total_pages\": 15\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Product details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{mock_url}}/api/v1/products/101",
+              "host": [
+                "{{mock_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products",
+                "101"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Product details",
+              "originalRequest": {
+                "method": "GET",
+                "header": []
+              },
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"Lấy chi tiết sản phẩm thành công\",\n    \"data\": {\n        \"product_id\": 101,\n        \"store_id\": 5,\n        \"category_id\": 2,\n        \"sku\": \"LAP-LENOVO-T14\",\n        \"product_name\": \"Laptop Lenovo ThinkPad T14\",\n        \"description\": \"Dòng laptop doanh nhân siêu bền bỉ, chip Intel Core i7 thế hệ 13, RAM 16GB, SSD 512GB.\",\n        \"price\": 25000000,\n        \"stock_quantity\": 50,\n        \"sold_quantity\": 120,\n        \"images\": [\n            \"https://picsum.photos/800/800\",\n            \"https://picsum.photos/800/801\"\n        ],\n        \"status\": \"ACTIVE\"\n    }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cart Management",
+      "item": [
+        {
+          "name": "Add Cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-mock-match-request-body",
+                "value": "false"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"product_id\": 101,\r\n    \"quantity\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{mock_url}}/api/v1/cart/items",
+              "host": [
+                "{{mock_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "cart",
+                "items"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Add Cart",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-mock-match-request-body",
+                    "value": "false"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"product_id\": 101,\n    \"quantity\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{mock_url}}/api/v1/cart/items",
+                  "host": [
+                    "{{mock_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "cart",
+                    "items"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "x-mock-match-request-body",
+                  "value": "false",
+                  "description": "",
+                  "enabled": true
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\r\n    \"status\": \"success\",\r\n    \"message\": \"Đã thêm sản phẩm vào giỏ hàng\",\r\n    \"data\": {\r\n        \"cart_id\": 55,\r\n        \"total_items\": 1,\r\n        \"items\": [\r\n            {\r\n                \"cart_item_id\": 120,\r\n                \"product_id\": 101,\r\n                \"product_name\": \"Laptop Lenovo ThinkPad T14\",\r\n                \"quantity\": 1,\r\n                \"price\": 25000000\r\n            }\r\n        ]\r\n    }\r\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Orders Management",
+      "item": [
+        {
+          "name": "Checkout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"recipient_name\": \"Nguyễn Quốc Bảo\",\r\n    \"recipient_phone\": \"0987654321\",\r\n    \"shipping_address_line\": \"123 Đường Tôn Đức Thắng\",\r\n    \"shipping_province\": \"TP. Hồ Chí Minh\",\r\n    \"payment_method\": \"COD\",\r\n    \"customer_note\": \"Giao hàng trong giờ hành chính giúp mình nhé\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{mock_url}}/api/v1/orders",
+              "host": [
+                "{{mock_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Checkout",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"recipient_name\": \"Nguyễn Quốc Bảo\",\r\n    \"recipient_phone\": \"0987654321\",\r\n    \"shipping_address_line\": \"123 Đường Tôn Đức Thắng\",\r\n    \"shipping_province\": \"TP. Hồ Chí Minh\",\r\n    \"payment_method\": \"COD\",\r\n    \"customer_note\": \"Giao hàng trong giờ hành chính giúp mình nhé\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{mock_url}}/api/v1/orders",
+                  "host": [
+                    "{{mock_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "orders"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\r\n    \"status\": \"success\",\r\n    \"message\": \"Đặt hàng thành công\",\r\n    \"data\": {\r\n        \"order_id\": 8899,\r\n        \"order_code\": \"ORD-20260610-XYZ\",\r\n        \"order_status\": \"PENDING\",\r\n        \"payment_method\": \"COD\",\r\n        \"amounts\": {\r\n            \"subtotal_amount\": 25000000,\r\n            \"shipping_fee\": 30000,\r\n            \"discount_amount\": 0,\r\n            \"total_amount\": 25030000\r\n        },\r\n        \"created_at\": \"2026-06-10T14:15:00Z\"\r\n    }\r\n}"
+            }
+          ]
+        },
+        {
+          "name": "Shipper",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"order_status\": \"SHIPPING\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{mock_url}}/api/v1/orders/8899/status",
+              "host": [
+                "{{mock_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders",
+                "8899",
+                "status"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Shipper",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"order_status\": \"SHIPPING\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{mock_url}}/api/v1/orders/8899/status",
+                  "host": [
+                    "{{mock_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "orders",
+                    "8899",
+                    "status"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"Cập nhật trạng thái đơn hàng thành công\",\n    \"data\": {\n        \"order_id\": 8899,\n        \"previous_status\": \"PENDING\",\n        \"new_status\": \"SHIPPING\",\n        \"updated_at\": \"2026-06-10T15:30:00Z\"\n    }\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
