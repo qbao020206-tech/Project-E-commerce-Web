@@ -31,4 +31,4 @@ class AuthControllers:
         
         return jsonify(result), status_code
         
-        
+    
