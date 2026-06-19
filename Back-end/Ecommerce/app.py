@@ -6,6 +6,7 @@ from config.settings import Config
 from extensions import db
 # Import đối tượng db từ file extensions.py để quản lý kết nối cơ sở dữ liệu
 from routes.auth_routes import auth_bp
+from routes.user_routes import user_bp
 # Import Blueprint auth_bp từ file routes/authu_routes.py để đăng ký các route liên quan đến xác thực người dùng
 def create_app():
     # Khởi tạo ứng dụng Flask
@@ -16,6 +17,7 @@ def create_app():
     db.init_app(app)
     # db Khởi tạo kết nối cơ sở dữ liệu với ứng dụng Flask bằng cách gọi phương thức init_app của đối tượng db
     app.register_blueprint(auth_bp)
+    app.register_blueprint(user_bp)
     # Đăng ký Blueprint auth_bp vào ứng dụng Flask để các route trong auth_bp có thể được sử dụng
     with app.app_context():
         try:
