@@ -1,23 +1,27 @@
 from models.role import Role
 
+
 class RoleService:
-    
+
+    # API 15: GET /api/v1/roles | Public
     @staticmethod
     def get_all_roles():
-        # 1. Truy vấn lấy toàn bộ quyền từ DB
-        roles = Role.query.all()
-        
-        # 2. Chuyển đổi dữ liệu sang dạng JSON
-        role_list = []
-        for role in roles:
-            role_list.append({
-                "role_id": role.role_id,
-                "role_name": role.role_name,
-                "description": role.description
-            })
-            
+        # Chỉ trả role có status='ACTIVE', sắp xếp theo role_id ASC
+        roles = Role.query.filter(Role.status == 'ACTIVE').order_by(Role.role_id.asc()).all()
+
+        role_list = [
+            {
+                'role_id': role.role_id,
+                'role_code': role.role_code,
+                'role_name': role.role_name,
+                'description': role.description,
+            }
+            for role in roles
+        ]
+
         return {
-            "status": "success", 
-            "message": "Lấy danh sách quyền thành công!", 
-            "data": role_list
+            'success': True,
+            'data': {
+                'roles': role_list
+            }
         }, 200

@@ -13,6 +13,15 @@ from routes.role_routes import role_bp
 from routes.product_routes import product_bp
 from routes.category_routes import category_bp
 from routes.seller_product_routes import seller_product_bp
+from routes.store_routes import store_bp
+from routes.cart_routes import cart_bp
+from routes.order_routes import order_bp
+from routes.seller_order_routes import seller_order_bp
+from routes.review_routes import review_bp
+from routes.conversation_routes import conversation_bp
+from routes.voucher_routes import voucher_bp
+from routes.shipment_routes import shipment_bp
+from routes.admin_routes import admin_bp
 def create_app():
     # Khởi tạo ứng dụng Flask
     app= Flask(__name__)
@@ -29,6 +38,15 @@ def create_app():
     app.register_blueprint(product_bp)
     app.register_blueprint(category_bp)
     app.register_blueprint(seller_product_bp)
+    app.register_blueprint(store_bp)
+    app.register_blueprint(cart_bp)
+    app.register_blueprint(order_bp)
+    app.register_blueprint(seller_order_bp)
+    app.register_blueprint(review_bp)
+    app.register_blueprint(conversation_bp)
+    app.register_blueprint(voucher_bp)
+    app.register_blueprint(shipment_bp)
+    app.register_blueprint(admin_bp)
     with app.app_context():
         try:
             from sqlalchemy import text

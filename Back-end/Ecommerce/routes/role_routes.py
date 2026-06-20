@@ -1,11 +1,11 @@
-from flask import Blueprint, request
+from flask import Blueprint
 from controllers.role_controller import RoleController
-from middlewares.auth_middleware import token_required
 
-role_bp = Blueprint('role', __name__, url_prefix='/api/v1/roles')
+role_bp = Blueprint('roles', __name__, url_prefix='/api/v1')
 
-# API Lấy danh sách Role (Phương thức GET)
-@role_bp.route('/', methods=['GET'], strict_slashes=False)
-@token_required
-def get_all_roles(current_user):
-   return RoleController.get_all_roles(current_user)
+# API 15: GET /api/v1/roles — Public (không cần token)
+role_bp.add_url_rule(
+    '/roles',
+    view_func=RoleController.get_all_roles,
+    methods=['GET']
+)
