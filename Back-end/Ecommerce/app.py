@@ -9,6 +9,7 @@ from routes.auth_routes import auth_bp
 # Import Blueprint auth_bp từ file routes/authu_routes.py để đăng ký các route liên quan đến xác thực người dùng
 from routes.user_routes import user_bp
 from routes.address_routes import address_bp
+from routes.role_routes import role_bp
 def create_app():
     # Khởi tạo ứng dụng Flask
     app= Flask(__name__)
@@ -21,6 +22,7 @@ def create_app():
     # Đăng ký Blueprint auth_bp vào ứng dụng Flask để các route trong auth_bp có thể được sử dụng
     app.register_blueprint(user_bp)
     app.register_blueprint(address_bp)
+    app.register_blueprint(role_bp)
     with app.app_context():
         try:
             from sqlalchemy import text
