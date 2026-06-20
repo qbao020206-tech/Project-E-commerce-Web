@@ -3,3 +3,6 @@ flask-sqlalchemy
 pyodbc
 python-dotenv
 PyJWT
+python-slugify
+nanoid
+pytz

@@ -11,6 +11,8 @@ from routes.user_routes import user_bp
 from routes.address_routes import address_bp
 from routes.role_routes import role_bp
 from routes.product_routes import product_bp
+from routes.category_routes import category_bp
+from routes.seller_product_routes import seller_product_bp
 def create_app():
     # Khởi tạo ứng dụng Flask
     app= Flask(__name__)
@@ -25,6 +27,8 @@ def create_app():
     app.register_blueprint(address_bp)
     app.register_blueprint(role_bp)
     app.register_blueprint(product_bp)
+    app.register_blueprint(category_bp)
+    app.register_blueprint(seller_product_bp)
     with app.app_context():
         try:
             from sqlalchemy import text

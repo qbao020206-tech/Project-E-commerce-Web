@@ -33,12 +33,7 @@ class AddressController:
     
     
     @staticmethod
+    @token_required
     def delete_address(current_user, address_id):
         result, status_code = AddressService.delete_address(current_user['user_id'], address_id)
-        return jsonify(result), status_code
-    
-    
-    @staticmethod
-    def set_default_address(current_user, address_id):
-        result, status_code = AddressService.set_default_address(current_user['user_id'], address_id)
         return jsonify(result), status_code

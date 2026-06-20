@@ -25,6 +25,7 @@ import asyncio
 import re
 import time
 import random
+import unicodedata
 import pyodbc
 import pandas as pd
 from pathlib import Path
@@ -61,18 +62,39 @@ def load_urls() -> list[dict]:
             "Tạo file với 2 cột: shop_url | category_id"
         )
     df = pd.read_excel(xlsx, dtype=str)
-    # Xử lý BOM (\ufeff) và ký tự ẩn trong tên cột
-    df.columns = [re.sub(r'[^a-z0-9_]', '', str(c).lower()) for c in df.columns]
-    if "shop_url" not in df.columns:
-        print(f"  DEBUG – Cột đọc được: {list(df.columns)}")   # in ra để debug
-        raise ValueError("Excel thiếu cột 'shop_url'")
+
+    def _normalize_col_name(name: str) -> str:
+        clean = str(name).strip()
+        clean = unicodedata.normalize('NFKD', clean)
+        clean = clean.encode('ascii', 'ignore').decode('ascii')
+        clean = clean.lower().replace(' ', '_')
+        return re.sub(r'[^a-z0-9_]', '', clean)
+
+    col_map = {_normalize_col_name(c): c for c in df.columns}
+    shop_col = None
+    for candidate in [
+        "shop_url", "shopurl", "url", "url_cua_hang",
+        "urlcuhang", "urlcuhng", "url_cua_hang_"
+    ]:
+        if candidate in col_map:
+            shop_col = col_map[candidate]
+            break
+    if not shop_col:
+        print(f"  DEBUG – Cột đọc được: {list(col_map.keys())}")
+        raise ValueError("Excel thiếu cột 'shop_url' hoặc cột URL cửa hàng")
+
+    category_col = col_map.get(
+        "category_id",
+        next((col_map[c] for c in ["categoryid", "category"] if c in col_map), None)
+    )
+
     rows = []
     for _, r in df.iterrows():
-        url = str(r.get("shop_url", "")).strip()
+        url = str(r.get(shop_col, "")).strip()
         url = url.split("?")[0]   # bỏ ?spm=... ở cuối URL
         if not url or url in ("nan", "") or url.startswith("#"):
             continue
-        cat_raw = r.get("category_id", "1")
+        cat_raw = r.get(category_col, "1") if category_col else "1"
         try:
             cat = int(float(str(cat_raw)))
         except Exception:
