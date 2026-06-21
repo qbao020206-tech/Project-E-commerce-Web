@@ -19,8 +19,8 @@ class User(db.Model):
     # Đặt tên bảng trong cơ sở dữ liệu là 'users' nên sử dụng __tablename__ để chỉ định tên bảng
     
     user_id = db.Column(db.BigInteger,primary_key=True, autoincrement=True)
-    email = db.Column(db.String(250), nullable=False, unique=True)
-    phone = db.Column(db.String(20), nullable=False)
+    email = db.Column(db.String(250), nullable=True, unique=True)   # nullable: user có thể đăng ký chỉ bằng phone
+    phone = db.Column(db.String(20), nullable=True, unique=True)     # nullable: user có thể đăng ký chỉ bằng email
     password_hash = db.Column(db.String(255), nullable=False)
     full_name = db.Column(db.Unicode(150), nullable=False)
     avatar_url = db.Column(db.String(500), nullable=True)

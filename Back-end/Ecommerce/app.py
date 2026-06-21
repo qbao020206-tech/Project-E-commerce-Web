@@ -22,6 +22,8 @@ from routes.conversation_routes import conversation_bp
 from routes.voucher_routes import voucher_bp
 from routes.shipment_routes import shipment_bp
 from routes.admin_routes import admin_bp
+from models.refresh_token import RefreshToken  # Đăng ký bảng refresh_tokens với SQLAlchemy
+
 def create_app():
     # Khởi tạo ứng dụng Flask
     app= Flask(__name__)
