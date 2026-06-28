@@ -23,7 +23,7 @@ class ShipmentService:
         try:
             sql = text("""
                 SELECT s.shipment_id, s.tracking_code, s.shipment_status,
-                       s.carrier, s.assigned_at, s.picked_up_at,
+                       s.assigned_at, s.picked_up_at,
                        s.delivered_at, s.failed_reason, s.created_at, s.updated_at
                 FROM shipments s
                 JOIN orders o ON s.order_id = o.order_id
@@ -53,7 +53,6 @@ class ShipmentService:
                     'shipment_id': row.shipment_id,
                     'order_id': order_id,
                     'tracking_code': row.tracking_code,
-                    'carrier': row.carrier,
                     'shipment_status': row.shipment_status,
                     'assigned_at': row.assigned_at.isoformat() if row.assigned_at else None,
                     'picked_up_at': row.picked_up_at.isoformat() if row.picked_up_at else None,
@@ -90,7 +89,7 @@ class ShipmentService:
 
             # Data
             data_sql = text("""
-                SELECT s.shipment_id, s.order_id, s.tracking_code, s.carrier,
+                SELECT s.shipment_id, s.order_id, s.tracking_code, 
                        s.shipment_status, s.assigned_at, s.picked_up_at,
                        s.delivered_at, s.failed_reason, s.created_at,
                        o.order_code, o.recipient_name, o.shipping_province,
@@ -115,7 +114,6 @@ class ShipmentService:
                     'order_id': r.order_id,
                     'order_code': r.order_code,
                     'tracking_code': r.tracking_code,
-                    'carrier': r.carrier,
                     'shipment_status': r.shipment_status,
                     'recipient_name': r.recipient_name,
                     'shipping_province': r.shipping_province,

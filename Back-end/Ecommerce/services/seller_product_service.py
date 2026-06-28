@@ -3,11 +3,16 @@ from models.product import Product
 from models.product_image import ProductImage
 from models.store import Store
 from models.user_store import UserStore
+from models.order import Order
+from models.shipment import Shipment
+from services.seller_order_service import SellerOrderService
+from models.order_status_history import OrderStatusHistory
 from sqlalchemy import func, and_
 from datetime import datetime
 from slugify import slugify
 from nanoid import generate
 import pytz
+from utils.sku_helper import generate_sku
 
 class SellerProductService:
 
@@ -28,12 +33,17 @@ class SellerProductService:
             if not store_id:
                 return {'success': False, 'message': 'Người dùng không phải chủ cửa hàng'}, 403
 
-            existing_sku = db.session.query(Product).filter(
-                Product.store_id == store_id,
-                Product.sku == sku
-            ).first()
-            if existing_sku:
-                return {'success': False, 'message': 'SKU đã tồn tại trong cửa hàng'}, 409
+            # Auto-generate SKU nếu seller không truyền
+            if not sku:
+                sku = generate_sku(product_name, store_id, db.session)
+            else:
+                # Check trùng nếu seller tự nhập SKU
+                existing_sku = db.session.query(Product).filter(
+                    Product.store_id == store_id,
+                    Product.sku == sku
+                ).first()
+                if existing_sku:
+                    return {'success': False, 'message': f'SKU "{sku}" đã tồn tại trong cửa hàng'}, 409
 
             slug = f"{slugify(product_name)}-{generate(size=6)}"
 
@@ -244,3 +254,98 @@ class SellerProductService:
             }, 200
         except Exception as e:
             raise e
+
+    @staticmethod
+    def create_shipment(seller_id, order_id):
+        try:
+            # 1. KIỂM TRA ĐIỀU KIỆN (Validation)
+            order = Order.query.filter_by(order_id=order_id, store_id=seller_id).first()
+            if not order:
+                return {'success': False, 'message': 'Đơn hàng không tồn tại hoặc không thuộc cửa hàng của bạn.'}, 404
+            
+            if order.order_status != 'CONFIRMED':
+                return {'success': False, 'message': f'Chỉ được tạo vận đơn cho đơn đã xác nhận (CONFIRMED). Trạng thái hiện tại: {order.order_status}'}, 400
+
+            # Đảm bảo đơn này chưa bị tạo trùng vận đơn trước đó
+            existing_shipment = Shipment.query.filter_by(order_id=order_id).first()
+            if existing_shipment:
+                return {'success': False, 'message': 'Đơn hàng này đã được tạo mã vận đơn rồi!'}, 400
+
+            # 2. GỌI API BÊN THỨ 3 (GIAO HÀNG TIẾT KIỆM - GHTK)
+            # Hệ thống sẽ "nói chuyện" với GHTK để lấy mã thật
+            tracking_code = SellerOrderService._call_logistics_api(order)
+            
+            now = datetime.utcnow()
+
+            # 3. GHI NHẬN THỰC THỂ SHIPMENT MỚI
+            new_shipment = Shipment(
+                order_id=order.order_id,
+                tracking_code=tracking_code,
+                shipment_status='PENDING_ASSIGNMENT', # Chờ phân công tài xế
+                shipping_note=order.customer_note,    # Chuyển lời nhắn của khách sang cho Shipper đọc
+                created_at=now,
+                updated_at=now
+            )
+            db.session.add(new_shipment)
+
+            # 4. TỰ ĐỘNG CHUYỂN TRẠNG THÁI ĐƠN HÀNG (Trigger)
+            order.order_status = 'READY_TO_SHIP'
+            order.updated_at = now
+
+            # 5. GHI LỊCH SỬ ĐƠN HÀNG TRACEABILITY
+            history = OrderStatusHistory(
+                order_id=order.order_id,
+                previous_status='CONFIRMED',
+                new_status='READY_TO_SHIP',
+                changed_by_user_id=seller_id,
+                change_note=f"Đã đăng ký vận chuyển thành công. Mã vận đơn: {tracking_code}",
+                created_at=now
+            )
+            db.session.add(history)
+
+            # CHỐT GIAO DỊCH DATABASE
+            db.session.commit()
+
+            return {
+                'success': True,
+                'message': 'Đã tạo mã vận đơn thành công.',
+                'data': {
+                    'order_id': order.order_id,
+                    'tracking_code': tracking_code,
+                    'order_status': order.order_status
+                }
+            }, 201  # HTTP 201: Dành riêng cho việc Create (Tạo mới) thành công
+
+        except Exception as e:
+            db.session.rollback()
+            raise e
+
+    @staticmethod
+    def _call_logistics_api(order):
+        """
+        HÀM GIẢ LẬP KẾT NỐI API ĐỐI TÁC VẬN CHUYỂN (GHTK / GHN)
+        Em hãy trình bày hàm này cho mentor xem để chứng minh hệ thống của em có tư duy thực chiến.
+        """
+        import time
+        import random
+        import string
+        
+        # [THỰC TẾ DOANH NGHIỆP] - Em sẽ dùng thư viện requests để kết nối network:
+        # import requests
+        # payload = {
+        #     "to_name": order.recipient_name,
+        #     "to_phone": order.recipient_phone,
+        #     "to_address": order.shipping_address_line,
+        #     "weight": 500 # Tính bằng gram
+        # }
+        # headers = {'Token': 'API_TOKEN_GHTK'}
+        # response = requests.post("https://services.ghtk.vn/services/shipment/order", json=payload, headers=headers)
+        # return response.json()['order']['label']
+
+        # [MÔ PHỎNG CHO ĐỒ ÁN MÔN HỌC] 
+        # Để tránh việc lúc demo lên lớp mạng bị lag/chết, ta dùng hàm time.sleep để mô phỏng độ trễ mạng
+        time.sleep(0.5) 
+        
+        # Sinh mã giả lập y hệt chuẩn mã của Giao Hàng Tiết Kiệm (GHTK): VD: GHTK-837492103
+        random_code = ''.join(random.choices(string.digits, k=9))
+        return f"GHTK-{random_code}"

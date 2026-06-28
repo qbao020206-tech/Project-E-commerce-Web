@@ -1,7 +1,45 @@
+"""
+Thêm generate-sku endpoint vào controller này.
+"""
 from flask import request, jsonify
 from services.seller_product_service import SellerProductService
+from utils.sku_helper import generate_sku
+from extensions import db
+
 
 class SellerProductController:
+
+    @staticmethod
+    def generate_sku_api(current_user):
+        """
+        GET /api/v1/seller/products/generate-sku?name=<tên sản phẩm>
+        Gợi ý SKU tự động cho seller dựa trên tên sản phẩm.
+        """
+        try:
+            if 'Seller' not in current_user.get('roles', []):
+                return jsonify({'success': False, 'message': 'Chỉ người bán mới có thể dùng tính năng này'}), 403
+
+            name = request.args.get('name', '').strip()
+            if not name:
+                return jsonify({'success': False, 'message': 'Thiếu tên sản phẩm'}), 400
+
+            user_id = current_user['user_id']
+            store_id = SellerProductService.get_seller_store(user_id)
+            if not store_id:
+                return jsonify({'success': False, 'message': 'Chưa có shop'}), 404
+
+            suggested_sku = generate_sku(name, store_id, db.session)
+
+            return jsonify({
+                'success': True,
+                'data': {
+                    'suggested_sku': suggested_sku,
+                    'note': 'Bạn có thể dùng mã này hoặc nhập mã khác khi tạo sản phẩm'
+                }
+            }), 200
+
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
 
     @staticmethod
     def create_product(current_user):
@@ -11,7 +49,7 @@ class SellerProductController:
 
             data = request.get_json()
 
-            required_fields = ['category_id', 'sku', 'product_name', 'price']
+            required_fields = ['category_id', 'product_name', 'price']
             if not all(field in data for field in required_fields):
                 return jsonify({'success': False, 'message': 'Thiếu trường bắt buộc'}), 400
 
@@ -22,10 +60,13 @@ class SellerProductController:
             if not isinstance(stock_quantity, int) or stock_quantity < 0:
                 stock_quantity = 0
 
+            # SKU là optional — auto-generate nếu không truyền
+            sku = data.get('sku', '').strip()
+
             result, status_code = SellerProductService.create_product(
                 user_id=current_user['user_id'],
                 category_id=data['category_id'],
-                sku=data['sku'],
+                sku=sku,  # Truyền rỗng để service tự generate nếu cần
                 product_name=data['product_name'],
                 description=data.get('description'),
                 price=data['price'],

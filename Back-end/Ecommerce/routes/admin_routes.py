@@ -59,3 +59,32 @@ admin_bp.add_url_rule(
     view_func=token_required(AdminController.assign_shipper),
     methods=['POST']
 )
+
+# API A: POST /api/v1/admin/roles — Admin only | Tạo role mới
+admin_bp.add_url_rule(
+    '/admin/roles',
+    view_func=token_required(AdminController.create_role),
+    methods=['POST']
+)
+
+# API B: PATCH /api/v1/admin/roles/:id — Admin only | Sửa role
+admin_bp.add_url_rule(
+    '/admin/roles/<int:role_id>',
+    view_func=token_required(AdminController.update_role),
+    methods=['PATCH']
+)
+
+# API C: DELETE /api/v1/admin/roles/:id — Admin only | Vô hiệu hóa role (soft delete)
+admin_bp.add_url_rule(
+    '/admin/roles/<int:role_id>',
+    view_func=token_required(AdminController.delete_role),
+    methods=['DELETE']
+)
+
+# API D: DELETE /api/v1/admin/users/:id/roles/:role_id — Admin only | Thu hồi role khỏi user
+# ⚠ Đặt TRƯỚC route POST /admin/users/:id/roles (assign_role) để tránh Flask bắt nhầm
+admin_bp.add_url_rule(
+    '/admin/users/<int:user_id>/roles/<int:role_id>',
+    view_func=token_required(AdminController.revoke_role),
+    methods=['DELETE']
+)

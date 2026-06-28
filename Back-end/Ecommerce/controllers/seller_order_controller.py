@@ -84,3 +84,19 @@ class SellerOrderController:
             return jsonify(result), status_code
         except Exception as e:
             return jsonify({'success': False, 'message': str(e)}), 500
+
+    @staticmethod
+    def create_shipment(current_user, order_id):
+        try:
+            # Chỉ có role SELLER mới được phép thao tác gọi xe giao hàng
+            if 'SELLER' not in current_user.get('roles', []):
+                return jsonify({'success': False, 'message': 'Chỉ Người bán mới được phép tạo vận đơn.'}), 403
+
+            result, status_code = SellerOrderService.create_shipment(
+                seller_id=current_user['user_id'],
+                order_id=order_id
+            )
+            return jsonify(result), status_code
+
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500

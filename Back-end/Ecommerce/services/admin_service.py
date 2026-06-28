@@ -507,3 +507,206 @@ class AdminService:
         except Exception as e:
             db.session.rollback()
             raise e
+
+    # ── API A: POST /api/v1/admin/roles | Admin only ──────────────────────────
+    @staticmethod
+    def create_role(role_code, role_name, description):
+        import re
+        try:
+            # Validate format
+            if not role_code or not role_name:
+                return {'success': False, 'message': 'role_code và role_name là bắt buộc'}, 400
+
+            if not re.match(r'^[A-Z][A-Z0-9_]{1,29}$', role_code):
+                return {
+                    'success': False,
+                    'message': 'role_code chỉ gồm chữ hoa, số, dấu gạch dưới; bắt đầu bằng chữ hoa; tối đa 30 ký tự'
+                }, 400
+
+            # Check trùng role_code
+            existing = db.session.query(Role).filter(Role.role_code == role_code).first()
+            if existing:
+                return {'success': False, 'message': f'role_code "{role_code}" đã tồn tại'}, 409
+
+            utc = pytz.UTC
+            now = datetime.now(utc)
+
+            new_role = Role(
+                role_code=role_code,
+                role_name=role_name,
+                description=description or None,
+                is_system_role=False,
+                status='ACTIVE',
+                created_at=now,
+                updated_at=now
+            )
+            db.session.add(new_role)
+            db.session.commit()
+
+            return {
+                'success': True,
+                'data': {
+                    'role_id': new_role.role_id,
+                    'role_code': new_role.role_code,
+                    'role_name': new_role.role_name,
+                    'description': new_role.description,
+                    'status': new_role.status,
+                    'created_at': new_role.created_at.isoformat() if new_role.created_at else None,
+                },
+                'message': 'Tạo role thành công'
+            }, 201
+
+        except Exception as e:
+            db.session.rollback()
+            raise e
+
+    # ── API B: PATCH /api/v1/admin/roles/:id | Admin only ────────────────────
+    @staticmethod
+    def update_role(role_id, data):
+        try:
+            role = db.session.query(Role).filter(Role.role_id == role_id).first()
+            if not role:
+                return {'success': False, 'message': 'Role không tồn tại'}, 404
+
+            if role.is_system_role:
+                return {
+                    'success': False,
+                    'message': f'Không thể sửa role hệ thống "{role.role_code}"'
+                }, 403
+
+            if not data:
+                return {'success': False, 'message': 'Không có dữ liệu cập nhật'}, 400
+
+            allowed = {'role_name', 'description', 'status'}
+            updates = {k: v for k, v in data.items() if k in allowed}
+            if not updates:
+                return {'success': False, 'message': 'Không có field hợp lệ để cập nhật'}, 400
+
+            if 'status' in updates and updates['status'] not in ('ACTIVE', 'SUSPENDED'):
+                return {'success': False, 'message': 'status chỉ nhận ACTIVE hoặc SUSPENDED'}, 400
+
+            utc = pytz.UTC
+            now = datetime.now(utc)
+
+            for key, value in updates.items():
+                setattr(role, key, value)
+            role.updated_at = now
+            db.session.commit()
+
+            return {
+                'success': True,
+                'data': {
+                    'role_id': role.role_id,
+                    'role_code': role.role_code,
+                    'role_name': role.role_name,
+                    'description': role.description,
+                    'status': role.status,
+                    'updated_at': role.updated_at.isoformat() if role.updated_at else None,
+                }
+            }, 200
+
+        except Exception as e:
+            db.session.rollback()
+            raise e
+
+    # ── API C: DELETE /api/v1/admin/roles/:id | Admin only (soft delete) ──────
+    @staticmethod
+    def delete_role(role_id):
+        try:
+            role = db.session.query(Role).filter(Role.role_id == role_id).first()
+            if not role:
+                return {'success': False, 'message': 'Role không tồn tại'}, 404
+
+            if role.is_system_role:
+                return {
+                    'success': False,
+                    'message': f'Không thể xóa role hệ thống "{role.role_code}"'
+                }, 403
+
+            if role.status == 'SUSPENDED':
+                return {'success': False, 'message': 'Role đã bị vô hiệu hóa trước đó rồi'}, 400
+
+            # Kiểm tra còn user đang dùng role này không
+            active_count_sql = text("""
+                SELECT COUNT(*) FROM user_roles
+                WHERE role_id = :role_id AND status = 'ACTIVE'
+            """)
+            active_count = db.session.execute(active_count_sql, {'role_id': role_id}).scalar() or 0
+
+            if active_count > 0:
+                return {
+                    'success': False,
+                    'message': f'Không thể xóa: còn {active_count} user đang có role này. Thu hồi role khỏi tất cả user trước.'
+                }, 409
+
+            # Soft delete: chuyển status → SUSPENDED
+            utc = pytz.UTC
+            now = datetime.now(utc)
+            role.status = 'SUSPENDED'
+            role.updated_at = now
+            db.session.commit()
+
+            return {
+                'success': True,
+                'message': f'Đã vô hiệu hóa role "{role.role_code}"'
+            }, 200
+
+        except Exception as e:
+            db.session.rollback()
+            raise e
+
+    # ── API D: DELETE /api/v1/admin/users/:id/roles/:role_id | Admin only ─────
+    @staticmethod
+    def revoke_role(admin_user_id, target_user_id, role_id):
+        try:
+            # Kiểm tra user tồn tại
+            user = db.session.query(User).filter(
+                User.user_id == target_user_id,
+                User.deleted_at.is_(None)
+            ).first()
+            if not user:
+                return {'success': False, 'message': 'User không tồn tại'}, 404
+
+            # Kiểm tra assignment đang ACTIVE
+            assignment_sql = text("""
+                SELECT ur.user_role_id, r.role_code, r.is_system_role
+                FROM user_roles ur
+                JOIN roles r ON ur.role_id = r.role_id
+                WHERE ur.user_id = :user_id AND ur.role_id = :role_id AND ur.status = 'ACTIVE'
+            """)
+            assignment = db.session.execute(
+                assignment_sql,
+                {'user_id': target_user_id, 'role_id': role_id}
+            ).fetchone()
+
+            if not assignment:
+                return {'success': False, 'message': 'User không có role này'}, 404
+
+            # Không cho admin tự thu hồi quyền Admin của chính mình
+            if assignment.role_code == 'ADMIN' and target_user_id == admin_user_id:
+                return {
+                    'success': False,
+                    'message': 'Không thể tự thu hồi quyền Admin của chính mình'
+                }, 403
+
+            utc = pytz.UTC
+            now = datetime.now(utc)
+
+            revoke_sql = text("""
+                UPDATE user_roles
+                SET status = 'REVOKED',
+                    revoked_at = :now,
+                    updated_at = :now
+                WHERE user_role_id = :user_role_id
+            """)
+            db.session.execute(revoke_sql, {'now': now, 'user_role_id': assignment.user_role_id})
+            db.session.commit()
+
+            return {
+                'success': True,
+                'message': f'Đã thu hồi role "{assignment.role_code}" khỏi user'
+            }, 200
+
+        except Exception as e:
+            db.session.rollback()
+            raise e

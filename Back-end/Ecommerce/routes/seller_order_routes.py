@@ -31,3 +31,6 @@ seller_order_bp.add_url_rule(
     view_func=token_required(SellerOrderController.get_order_status_history),
     methods=['GET']
 )
+
+# API: Tạo mã vận đơn (Đăng ký giao hàng qua đối tác vận chuyển)
+seller_order_bp.route('/<int:order_id>/shipments', methods=['POST'])(token_required(SellerOrderController.create_shipment))

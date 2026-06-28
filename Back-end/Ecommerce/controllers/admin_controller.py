@@ -220,3 +220,69 @@ class AdminController:
 
         except Exception as e:
             return jsonify({'success': False, 'message': str(e)}), 500
+
+    # ── API A: POST /api/v1/admin/roles | Admin only ──────────────────────────
+    @staticmethod
+    def create_role(current_user):
+        try:
+            if 'Admin' not in current_user.get('roles', []):
+                return jsonify({'success': False, 'message': 'Chỉ Admin mới có thể tạo role'}), 403
+
+            data = request.get_json() or {}
+            role_code = data.get('role_code', '').strip().upper()
+            role_name = data.get('role_name', '').strip()
+            description = data.get('description', '').strip()
+
+            result, status_code = AdminService.create_role(
+                role_code=role_code,
+                role_name=role_name,
+                description=description
+            )
+            return jsonify(result), status_code
+
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    # ── API B: PATCH /api/v1/admin/roles/:id | Admin only ────────────────────
+    @staticmethod
+    def update_role(current_user, role_id):
+        try:
+            if 'Admin' not in current_user.get('roles', []):
+                return jsonify({'success': False, 'message': 'Chỉ Admin mới có thể sửa role'}), 403
+
+            data = request.get_json()
+            result, status_code = AdminService.update_role(role_id=role_id, data=data)
+            return jsonify(result), status_code
+
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    # ── API C: DELETE /api/v1/admin/roles/:id | Admin only ───────────────────
+    @staticmethod
+    def delete_role(current_user, role_id):
+        try:
+            if 'Admin' not in current_user.get('roles', []):
+                return jsonify({'success': False, 'message': 'Chỉ Admin mới có thể xóa role'}), 403
+
+            result, status_code = AdminService.delete_role(role_id=role_id)
+            return jsonify(result), status_code
+
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    # ── API D: DELETE /api/v1/admin/users/:id/roles/:role_id | Admin only ─────
+    @staticmethod
+    def revoke_role(current_user, user_id, role_id):
+        try:
+            if 'Admin' not in current_user.get('roles', []):
+                return jsonify({'success': False, 'message': 'Chỉ Admin mới có thể thu hồi role'}), 403
+
+            result, status_code = AdminService.revoke_role(
+                admin_user_id=current_user['user_id'],
+                target_user_id=user_id,
+                role_id=role_id
+            )
+            return jsonify(result), status_code
+
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
