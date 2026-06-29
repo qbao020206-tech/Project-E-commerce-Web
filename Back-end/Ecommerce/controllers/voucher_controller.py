@@ -8,7 +8,7 @@ class VoucherController:
     @staticmethod
     def check_voucher(current_user):
         try:
-            if 'Customer' not in current_user.get('roles', []):
+            if 'CUSTOMER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ khách hàng mới có thể kiểm tra voucher'}), 403
 
             code = request.args.get('code', '').strip()
@@ -43,7 +43,7 @@ class VoucherController:
     def create_voucher(current_user):
         try:
             roles = current_user.get('roles', [])
-            if 'Admin' not in roles and 'Seller' not in roles:
+            if 'ADMIN' not in roles and 'SELLER' not in roles:
                 return jsonify({'success': False, 'message': 'Chỉ Admin hoặc Seller mới có thể tạo voucher'}), 403
 
             data = request.get_json() or {}
@@ -62,7 +62,7 @@ class VoucherController:
     def update_voucher_status(current_user, voucher_id):
         try:
             roles = current_user.get('roles', [])
-            if 'Admin' not in roles and 'Seller' not in roles:
+            if 'ADMIN' not in roles and 'SELLER' not in roles:
                 return jsonify({'success': False, 'message': 'Chỉ Admin hoặc Seller mới có thể cập nhật voucher'}), 403
 
             data = request.get_json() or {}

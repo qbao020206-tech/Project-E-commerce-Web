@@ -12,7 +12,7 @@ class ConversationController:
             user_id = current_user['user_id']
 
             # Phải là Customer hoặc Seller
-            if 'Customer' not in roles and 'Seller' not in roles:
+            if 'CUSTOMER' not in roles and 'SELLER' not in roles:
                 return jsonify({'success': False, 'message': 'Không có quyền truy cập'}), 403
 
             result, status_code = ConversationService.list_conversations(user_id, roles)
@@ -51,7 +51,7 @@ class ConversationController:
     def get_messages(current_user, conversation_id):
         try:
             roles = current_user.get('roles', [])
-            if 'Customer' not in roles and 'Seller' not in roles:
+            if 'CUSTOMER' not in roles and 'SELLER' not in roles:
                 return jsonify({'success': False, 'message': 'Không có quyền truy cập'}), 403
 
             try:
@@ -82,7 +82,7 @@ class ConversationController:
     def send_message(current_user, conversation_id):
         try:
             roles = current_user.get('roles', [])
-            if 'Customer' not in roles and 'Seller' not in roles:
+            if 'CUSTOMER' not in roles and 'SELLER' not in roles:
                 return jsonify({'success': False, 'message': 'Không có quyền truy cập'}), 403
 
             data = request.get_json() or {}
@@ -108,7 +108,7 @@ class ConversationController:
     def mark_as_read(current_user, conversation_id):
         try:
             roles = current_user.get('roles', [])
-            if 'Customer' not in roles and 'Seller' not in roles:
+            if 'CUSTOMER' not in roles and 'SELLER' not in roles:
                 return jsonify({'success': False, 'message': 'Không có quyền truy cập'}), 403
 
             result, status_code = ConversationService.mark_as_read(

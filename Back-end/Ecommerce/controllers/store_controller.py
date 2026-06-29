@@ -17,7 +17,7 @@ class StoreController:
     @staticmethod
     def get_my_store(current_user):
         try:
-            if 'Seller' not in current_user.get('roles', []):
+            if 'SELLER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ người bán mới có thể truy cập'}), 403
 
             result, status_code = StoreService.get_my_store(
@@ -31,7 +31,7 @@ class StoreController:
     @staticmethod
     def create_store(current_user):
         try:
-            if 'Seller' not in current_user.get('roles', []):
+            if 'SELLER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ người bán mới có thể tạo cửa hàng'}), 403
 
             data = request.get_json() or {}
@@ -59,7 +59,7 @@ class StoreController:
     @staticmethod
     def update_store(current_user):
         try:
-            if 'Seller' not in current_user.get('roles', []):
+            if 'SELLER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ người bán mới có thể cập nhật cửa hàng'}), 403
 
             data = request.get_json() or {}

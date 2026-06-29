@@ -8,7 +8,7 @@ class CartController:
     @staticmethod
     def get_my_cart(current_user):
         try:
-            if 'Customer' not in current_user.get('roles', []):
+            if 'CUSTOMER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ khách hàng mới có thể truy cập giỏ hàng'}), 403
 
             result, status_code = CartService.get_my_cart(
@@ -22,7 +22,7 @@ class CartController:
     @staticmethod
     def add_item(current_user):
         try:
-            if 'Customer' not in current_user.get('roles', []):
+            if 'CUSTOMER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ khách hàng mới có thể thêm vào giỏ hàng'}), 403
 
             data = request.get_json() or {}
@@ -49,7 +49,7 @@ class CartController:
     @staticmethod
     def update_item_qty(current_user, cart_item_id):
         try:
-            if 'Customer' not in current_user.get('roles', []):
+            if 'CUSTOMER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ khách hàng mới có thể cập nhật giỏ hàng'}), 403
 
             data = request.get_json() or {}
@@ -74,7 +74,7 @@ class CartController:
     @staticmethod
     def remove_item(current_user, cart_item_id):
         try:
-            if 'Customer' not in current_user.get('roles', []):
+            if 'CUSTOMER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ khách hàng mới có thể xóa sản phẩm trong giỏ hàng'}), 403
 
             result, status_code = CartService.remove_item(
@@ -89,7 +89,7 @@ class CartController:
     @staticmethod
     def clear_cart(current_user):
         try:
-            if 'Customer' not in current_user.get('roles', []):
+            if 'CUSTOMER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ khách hàng mới có thể xóa giỏ hàng'}), 403
 
             result, status_code = CartService.clear_cart(

@@ -143,8 +143,8 @@ class VoucherService:
         Seller: store_id bắt buộc và phải là store của họ.
         """
         try:
-            is_admin = 'Admin' in roles
-            is_seller = 'Seller' in roles
+            is_admin = 'ADMIN' in roles
+            is_seller = 'SELLER' in roles
 
             voucher_code = data.get('voucher_code', '').strip()
             voucher_name = data.get('voucher_name')
@@ -253,8 +253,8 @@ class VoucherService:
             if not voucher:
                 return {'success': False, 'message': 'Voucher không tồn tại'}, 404
 
-            is_admin = 'Admin' in roles
-            is_seller = 'Seller' in roles
+            is_admin = 'ADMIN' in roles
+            is_seller = 'SELLER' in roles
 
             if is_seller and not is_admin:
                 # Seller chỉ được update voucher thuộc store của mình

@@ -8,7 +8,7 @@ class ReviewController:
     @staticmethod
     def create_review(current_user):
         try:
-            if 'Customer' not in current_user.get('roles', []):
+            if 'CUSTOMER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ khách hàng mới có thể đánh giá sản phẩm'}), 403
 
             data = request.get_json() or {}
@@ -38,7 +38,7 @@ class ReviewController:
     def hide_review(current_user, review_id):
         try:
             roles = current_user.get('roles', [])
-            if 'Admin' not in roles and 'Manager' not in roles:
+            if 'ADMIN' not in roles :
                 return jsonify({'success': False, 'message': 'Chỉ Admin hoặc Manager mới có thể ẩn đánh giá'}), 403
 
             data = request.get_json() or {}

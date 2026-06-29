@@ -10,9 +10,7 @@ class UserController:
     def get_profile(current_user):
         user_id = current_user['user_id']
         result, status_code = UserService.get_profile(user_id)
-        return jsonify ({"status": "success",
-                         "message": "Lấy thông tin Profile thành công", 
-                         "data": current_user}), 200
+        return jsonify(result), status_code     
     @staticmethod
     def update_profile(current_user):
         data = request.get_json()

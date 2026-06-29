@@ -16,7 +16,7 @@ class SellerProductController:
         Gợi ý SKU tự động cho seller dựa trên tên sản phẩm.
         """
         try:
-            if 'Seller' not in current_user.get('roles', []):
+            if 'SELLER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ người bán mới có thể dùng tính năng này'}), 403
 
             name = request.args.get('name', '').strip()
@@ -44,7 +44,7 @@ class SellerProductController:
     @staticmethod
     def create_product(current_user):
         try:
-            if 'Seller' not in current_user.get('roles', []):
+            if 'SELLER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ người bán có thể tạo sản phẩm'}), 403
 
             data = request.get_json()
@@ -81,7 +81,7 @@ class SellerProductController:
     @staticmethod
     def update_product(current_user, product_id):
         try:
-            if 'Seller' not in current_user.get('roles', []):
+            if 'SELLER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ người bán có thể cập nhật sản phẩm'}), 403
 
             data = request.get_json() or {}
@@ -104,7 +104,7 @@ class SellerProductController:
     @staticmethod
     def delete_product(current_user, product_id):
         try:
-            if 'Seller' not in current_user.get('roles', []):
+            if 'SELLER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ người bán có thể xóa sản phẩm'}), 403
 
             result, status_code = SellerProductService.delete_product(
@@ -119,7 +119,7 @@ class SellerProductController:
     @staticmethod
     def get_seller_products(current_user):
         try:
-            if 'Seller' not in current_user.get('roles', []):
+            if 'SELLER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ người bán có thể xem sản phẩm của mình'}), 403
 
             page = request.args.get('page', 1, type=int)

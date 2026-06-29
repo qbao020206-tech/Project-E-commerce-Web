@@ -467,7 +467,7 @@ class AdminService:
                 SELECT u.user_id
                 FROM users u
                 JOIN user_roles ur ON ur.user_id = u.user_id AND ur.status = 'ACTIVE'
-                JOIN roles r ON r.role_id = ur.role_id AND r.role_code = 'Shipper'
+                JOIN roles r ON r.role_id = ur.role_id AND r.role_code = 'SHIPPER'
                 WHERE u.user_id = :sid AND u.deleted_at IS NULL
             """)
             shipper_row = db.session.execute(check_sql, {'sid': shipper_user_id}).fetchone()

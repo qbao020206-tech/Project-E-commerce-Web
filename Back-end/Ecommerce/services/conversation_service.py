@@ -44,8 +44,8 @@ class ConversationService:
     @staticmethod
     def list_conversations(user_id, roles):
         try:
-            is_seller = 'Seller' in roles
-            is_customer = 'Customer' in roles
+            is_seller = 'SELLER' in roles
+            is_customer = 'CUSTOMER' in roles
 
             if is_seller:
                 seller_store_id = ConversationService._get_seller_store_id(user_id)

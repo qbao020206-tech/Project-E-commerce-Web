@@ -131,7 +131,7 @@ class AdminController:
     def list_all_orders(current_user):
         try:
             roles = current_user.get('roles', [])
-            if 'Admin' not in roles and 'Manager' not in roles:
+            if 'ADMIN' not in roles :
                 return jsonify({'success': False, 'message': 'Không có quyền truy cập'}), 403
 
             status = request.args.get('status', '').strip().upper() or None
@@ -166,7 +166,7 @@ class AdminController:
     def revenue_report(current_user):
         try:
             roles = current_user.get('roles', [])
-            if 'Admin' not in roles and 'Manager' not in roles:
+            if 'ADMIN' not in roles :
                 return jsonify({'success': False, 'message': 'Không có quyền truy cập'}), 403
 
             from_date = request.args.get('from_date', '').strip()
@@ -198,7 +198,7 @@ class AdminController:
     @staticmethod
     def assign_shipper(current_user, order_id):
         try:
-            if 'Admin' not in current_user.get('roles', []):
+            if 'ADMIN' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ Admin mới có thể gán shipper'}), 403
 
             data = request.get_json() or {}
@@ -225,7 +225,7 @@ class AdminController:
     @staticmethod
     def create_role(current_user):
         try:
-            if 'Admin' not in current_user.get('roles', []):
+            if 'ADMIN' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ Admin mới có thể tạo role'}), 403
 
             data = request.get_json() or {}
@@ -247,7 +247,7 @@ class AdminController:
     @staticmethod
     def update_role(current_user, role_id):
         try:
-            if 'Admin' not in current_user.get('roles', []):
+            if 'ADMIN' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ Admin mới có thể sửa role'}), 403
 
             data = request.get_json()
@@ -261,7 +261,7 @@ class AdminController:
     @staticmethod
     def delete_role(current_user, role_id):
         try:
-            if 'Admin' not in current_user.get('roles', []):
+            if 'ADMIN' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ Admin mới có thể xóa role'}), 403
 
             result, status_code = AdminService.delete_role(role_id=role_id)
@@ -274,7 +274,7 @@ class AdminController:
     @staticmethod
     def revoke_role(current_user, user_id, role_id):
         try:
-            if 'Admin' not in current_user.get('roles', []):
+            if 'ADMIN' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ Admin mới có thể thu hồi role'}), 403
 
             result, status_code = AdminService.revoke_role(

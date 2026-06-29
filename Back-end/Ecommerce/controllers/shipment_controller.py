@@ -8,7 +8,7 @@ class ShipmentController:
     @staticmethod
     def track_shipment(current_user, order_id):
         try:
-            if 'Customer' not in current_user.get('roles', []):
+            if 'CUSTOMER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ khách hàng mới có thể theo dõi đơn giao'}), 403
 
             result, status_code = ShipmentService.track_shipment(
@@ -24,7 +24,7 @@ class ShipmentController:
     @staticmethod
     def list_assigned_shipments(current_user):
         try:
-            if 'Shipper' not in current_user.get('roles', []):
+            if 'SHIPPER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ shipper mới có thể xem danh sách giao hàng'}), 403
 
             status = request.args.get('status', '').strip().upper() or None
@@ -55,7 +55,7 @@ class ShipmentController:
     @staticmethod
     def update_shipment_status(current_user, shipment_id):
         try:
-            if 'Shipper' not in current_user.get('roles', []):
+            if 'SHIPPER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ shipper mới có thể cập nhật trạng thái giao hàng'}), 403
 
             data = request.get_json() or {}

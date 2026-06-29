@@ -8,7 +8,7 @@ class OrderController:
     @staticmethod
     def place_order(current_user):
         try:
-            if 'Customer' not in current_user.get('roles', []):
+            if 'CUSTOMER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ khách hàng mới có thể đặt hàng'}), 403
 
             data = request.get_json() or {}
@@ -55,7 +55,7 @@ class OrderController:
     @staticmethod
     def list_my_orders(current_user):
         try:
-            if 'Customer' not in current_user.get('roles', []):
+            if 'CUSTOMER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ khách hàng mới có thể xem đơn hàng'}), 403
 
             status = request.args.get('status', None)
@@ -81,7 +81,7 @@ class OrderController:
     @staticmethod
     def get_order_detail(current_user, order_id):
         try:
-            if 'Customer' not in current_user.get('roles', []):
+            if 'CUSTOMER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ khách hàng mới có thể xem đơn hàng'}), 403
 
             result, status_code = OrderService.get_order_detail(
@@ -96,7 +96,7 @@ class OrderController:
     @staticmethod
     def cancel_order(current_user, order_id):
         try:
-            if 'Customer' not in current_user.get('roles', []):
+            if 'CUSTOMER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ khách hàng mới có thể hủy đơn hàng'}), 403
 
             data = request.get_json() or {}

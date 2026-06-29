@@ -8,7 +8,7 @@ class SellerOrderController:
     @staticmethod
     def list_store_orders(current_user):
         try:
-            if 'Seller' not in current_user.get('roles', []):
+            if 'SELLER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ người bán mới có thể xem đơn hàng'}), 403
 
             status = request.args.get('status', None)
@@ -34,7 +34,7 @@ class SellerOrderController:
     @staticmethod
     def get_store_order_detail(current_user, order_id):
         try:
-            if 'Seller' not in current_user.get('roles', []):
+            if 'SELLER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ người bán mới có thể xem chi tiết đơn hàng'}), 403
 
             result, status_code = SellerOrderService.get_store_order_detail(
@@ -49,7 +49,7 @@ class SellerOrderController:
     @staticmethod
     def update_order_status(current_user, order_id):
         try:
-            if 'Seller' not in current_user.get('roles', []):
+            if 'SELLER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ người bán mới có thể cập nhật trạng thái đơn hàng'}), 403
 
             data = request.get_json() or {}
@@ -73,7 +73,7 @@ class SellerOrderController:
     def get_order_status_history(current_user, order_id):
         try:
             roles = current_user.get('roles', [])
-            if 'Seller' not in roles and 'Admin' not in roles:
+            if 'SELLER' not in roles and 'ADMIN' not in roles:
                 return jsonify({'success': False, 'message': 'Không có quyền xem lịch sử đơn hàng'}), 403
 
             result, status_code = SellerOrderService.get_order_status_history(

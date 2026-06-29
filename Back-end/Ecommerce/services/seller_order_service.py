@@ -255,7 +255,7 @@ class SellerOrderService:
                 return {'success': False, 'message': 'Đơn hàng không tồn tại'}, 404
 
             # Admin xem tất cả; Seller chỉ xem đơn của store mình
-            if 'Admin' not in roles:
+            if 'ADMIN' not in roles:
                 store_id = SellerOrderService._get_seller_store_id(user_id)
                 if not store_id or order.store_id != store_id:
                     return {'success': False, 'message': 'Không có quyền xem lịch sử đơn hàng này'}, 403
