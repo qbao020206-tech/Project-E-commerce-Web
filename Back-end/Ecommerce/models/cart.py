@@ -7,6 +7,7 @@ class Cart(db.Model):
 
     cart_id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
     customer_id = db.Column(db.BigInteger, db.ForeignKey('users.user_id'), nullable=False)
+    status = db.Column(db.String(20), nullable=False, default='ACTIVE')
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

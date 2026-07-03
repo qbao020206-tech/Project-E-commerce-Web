@@ -90,7 +90,7 @@ class StoreService:
                 .filter(
                     UserStore.user_id == user_id,
                     UserStore.store_member_role == 'OWNER',
-                    UserStore.is_active == 1
+                    UserStore.is_active == True
                 )
                 .first()
             )
@@ -118,7 +118,7 @@ class StoreService:
                 .filter(
                     UserStore.user_id == user_id,
                     UserStore.store_member_role == 'OWNER',
-                    UserStore.is_active == 1
+                    UserStore.is_active == True
                 )
                 .first()
             )
@@ -185,7 +185,7 @@ class StoreService:
                 .filter(
                     UserStore.user_id == user_id,
                     UserStore.store_member_role == 'OWNER',
-                    UserStore.is_active == 1
+                    UserStore.is_active == True
                 )
                 .first()
             )

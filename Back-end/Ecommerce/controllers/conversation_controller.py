@@ -26,7 +26,7 @@ class ConversationController:
     def create_conversation(current_user):
         try:
             roles = current_user.get('roles', [])
-            if 'Customer' not in roles:
+            if 'CUSTOMER' not in roles:
                 return jsonify({'success': False, 'message': 'Chỉ khách hàng mới có thể tạo cuộc trò chuyện'}), 403
 
             data = request.get_json() or {}

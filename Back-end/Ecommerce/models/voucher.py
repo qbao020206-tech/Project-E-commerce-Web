@@ -16,8 +16,6 @@ class Voucher(db.Model):
     max_discount_amount = db.Column(db.Numeric(18, 2), nullable=True)
     usage_limit = db.Column(db.Integer, nullable=True)
     used_count = db.Column(db.Integer, default=0)
-    # Alias kept for backward-compat with order_service (per_customer_limit)
-    per_customer_limit = db.Column(db.Integer, default=1)
     usage_limit_per_customer = db.Column(db.Integer, nullable=True)
     starts_at = db.Column(db.DateTime, nullable=True)
     ends_at = db.Column(db.DateTime, nullable=True)

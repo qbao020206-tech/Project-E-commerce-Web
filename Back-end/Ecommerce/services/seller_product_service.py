@@ -5,7 +5,6 @@ from models.store import Store
 from models.user_store import UserStore
 from models.order import Order
 from models.shipment import Shipment
-from services.seller_order_service import SellerOrderService
 from models.order_status_history import OrderStatusHistory
 from sqlalchemy import func, and_
 from datetime import datetime
@@ -21,8 +20,7 @@ class SellerProductService:
         query = db.session.query(UserStore.store_id).filter(
             UserStore.user_id == user_id,
             UserStore.store_member_role == 'OWNER',
-            UserStore.is_active == 1,
-            UserStore.deleted_at.is_(None)
+            UserStore.is_active == True
         ).first()
         return query[0] if query else None
 
@@ -273,7 +271,7 @@ class SellerProductService:
 
             # 2. GỌI API BÊN THỨ 3 (GIAO HÀNG TIẾT KIỆM - GHTK)
             # Hệ thống sẽ "nói chuyện" với GHTK để lấy mã thật
-            tracking_code = SellerOrderService._call_logistics_api(order)
+            tracking_code = SellerProductService._call_logistics_api(order)
             
             now = datetime.utcnow()
 

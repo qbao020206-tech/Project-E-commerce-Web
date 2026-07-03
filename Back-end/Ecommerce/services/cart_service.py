@@ -13,7 +13,8 @@ class CartService:
     def _get_or_create_cart(customer_id):
         """Lấy giỏ hàng của user, tự động tạo mới nếu chưa có."""
         cart = db.session.query(Cart).filter(
-            Cart.customer_id == customer_id
+            Cart.customer_id == customer_id,
+            Cart.status == 'ACTIVE'
         ).first()
 
         if not cart:
@@ -169,7 +170,8 @@ class CartService:
 
             # Lấy cart của user
             cart = db.session.query(Cart).filter(
-                Cart.customer_id == customer_id
+                Cart.customer_id == customer_id,
+                Cart.status == 'ACTIVE'
             ).first()
 
             if not cart:
@@ -219,7 +221,8 @@ class CartService:
     def remove_item(customer_id, cart_item_id):
         try:
             cart = db.session.query(Cart).filter(
-                Cart.customer_id == customer_id
+                Cart.customer_id == customer_id,
+                Cart.status == 'ACTIVE'
             ).first()
 
             if not cart:
@@ -248,7 +251,8 @@ class CartService:
     def clear_cart(customer_id):
         try:
             cart = db.session.query(Cart).filter(
-                Cart.customer_id == customer_id
+                Cart.customer_id == customer_id,
+                Cart.status == 'ACTIVE'
             ).first()
 
             if not cart:

@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from services.seller_order_service import SellerOrderService
+from services.seller_product_service import SellerProductService
 
 
 class SellerOrderController:
@@ -92,7 +93,7 @@ class SellerOrderController:
             if 'SELLER' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ Người bán mới được phép tạo vận đơn.'}), 403
 
-            result, status_code = SellerOrderService.create_shipment(
+            result, status_code = SellerProductService.create_shipment(
                 seller_id=current_user['user_id'],
                 order_id=order_id
             )

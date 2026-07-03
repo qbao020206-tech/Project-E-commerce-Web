@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from controllers.user_controller import UserController
 from middlewares.auth_middleware import token_required
 
-user_bp = Blueprint('user', __name__, url_prefix='/api/v1/users')
+user_bp = Blueprint('user', __name__, url_prefix='/api/v1')
 
 @user_bp.route('/me', methods=['GET', 'PATCH'])
 @token_required

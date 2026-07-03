@@ -87,7 +87,7 @@ class OrderService:
                     }, 400
 
                 # Kiểm tra per-customer limit
-                if voucher.per_customer_limit:
+                if voucher.usage_limit_per_customer:
                     customer_usage = db.session.query(OrderVoucher).join(
                         Order, Order.order_id == OrderVoucher.order_id
                     ).filter(
@@ -96,7 +96,7 @@ class OrderService:
                         Order.order_status != 'CANCELLED'
                     ).count()
 
-                    if customer_usage >= voucher.per_customer_limit:
+                    if customer_usage >= voucher.usage_limit_per_customer:
                         return {'success': False, 'message': 'Bạn đã sử dụng hết lượt voucher này'}, 400
 
                 # Tính discount
@@ -170,9 +170,9 @@ class OrderService:
             # === 9. INSERT status history ===
             history = OrderStatusHistory(
                 order_id=order.order_id,
-                prev_status=None,
+                previous_status=None,
                 new_status='PENDING',
-                changed_by=customer_id,
+                changed_by_user_id=customer_id,
                 created_at=now
             )
             db.session.add(history)
@@ -335,6 +335,7 @@ class OrderService:
                     'shipping_district': order.shipping_district,
                     'shipping_province': order.shipping_province,
                     'payment_method': order.payment_method,
+                    'payment_status': order.payment_status,
                     'customer_note': order.customer_note,
                     'subtotal': float(order.subtotal),
                     'discount_amount': float(order.discount_amount),
@@ -383,10 +384,10 @@ class OrderService:
             # INSERT status history
             history = OrderStatusHistory(
                 order_id=order.order_id,
-                prev_status='PENDING',
+                previous_status='PENDING',
                 new_status='CANCELLED',
-                changed_by=customer_id,
-                note=cancel_reason,
+                changed_by_user_id=customer_id,
+                change_note=cancel_reason,
                 created_at=now
             )
             db.session.add(history)

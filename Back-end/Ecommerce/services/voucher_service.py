@@ -18,7 +18,7 @@ class VoucherService:
             .filter(
                 UserStore.user_id == user_id,
                 UserStore.store_member_role == 'OWNER',
-                UserStore.is_active == 1
+                UserStore.is_active == True
             )
             .first()
         )
@@ -97,7 +97,7 @@ class VoucherService:
                 return {'success': True, 'data': {'valid': False, 'message': 'Voucher đã hết lượt sử dụng'}}, 200
 
             # Check per-customer limit
-            limit_per_cus = voucher.usage_limit_per_customer or voucher.per_customer_limit
+            limit_per_cus = voucher.usage_limit_per_customer
             if limit_per_cus:
                 customer_usage = (
                     db.session.query(OrderVoucher)
@@ -211,7 +211,6 @@ class VoucherService:
                 usage_limit=int(usage_limit) if usage_limit is not None else None,
                 used_count=0,
                 usage_limit_per_customer=int(usage_limit_per_customer) if usage_limit_per_customer is not None else None,
-                per_customer_limit=int(usage_limit_per_customer) if usage_limit_per_customer is not None else 1,
                 starts_at=starts_at,
                 ends_at=ends_at,
                 status='ACTIVE',
