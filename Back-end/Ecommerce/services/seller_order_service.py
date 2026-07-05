@@ -25,7 +25,7 @@ class SellerOrderService:
         result = db.session.query(UserStore.store_id).filter(
             UserStore.user_id == user_id,
             UserStore.store_member_role == 'OWNER',
-            UserStore.is_active == True
+            UserStore.is_active == 1
         ).first()
         return result[0] if result else None
 
@@ -154,7 +154,6 @@ class SellerOrderService:
                     'shipping_district': order.shipping_district,
                     'shipping_province': order.shipping_province,
                     'payment_method': order.payment_method,
-                    'payment_status': order.payment_status,
                     'customer_note': order.customer_note,
                     'subtotal': float(order.subtotal),
                     'discount_amount': float(order.discount_amount),
@@ -211,10 +210,10 @@ class SellerOrderService:
             # INSERT status history
             history = OrderStatusHistory(
                 order_id=order.order_id,
-                previous_status=prev_status,
+                prev_status=prev_status,
                 new_status=new_status,
-                changed_by_user_id=user_id,
-                change_note=change_note,
+                changed_by=user_id,
+                note=change_note,
                 created_at=now
             )
             db.session.add(history)
@@ -263,17 +262,17 @@ class SellerOrderService:
 
             histories = (
                 db.session.query(OrderStatusHistory, User.full_name)
-                .outerjoin(User, User.user_id == OrderStatusHistory.changed_by_user_id)
+                .outerjoin(User, User.user_id == OrderStatusHistory.changed_by)
                 .filter(OrderStatusHistory.order_id == order_id)
                 .order_by(OrderStatusHistory.created_at.asc())
                 .all()
             )
 
             history_list = [{
-                'previous_status': h.previous_status,
+                'previous_status': h.prev_status,
                 'new_status': h.new_status,
                 'changed_by_name': full_name,
-                'change_note': h.change_note,
+                'change_note': h.note,
                 'created_at': h.created_at.isoformat() if h.created_at else None,
             } for h, full_name in histories]
 

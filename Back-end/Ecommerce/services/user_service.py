@@ -57,11 +57,7 @@ class UserService:
         if not check_password_hash(user.password_hash, old_password):
             return {"status": "error", "message": "Mật khẩu cũ không chính xác!"}, 400
 
-        # 3. Validate độ dài mật khẩu mới (tối thiểu 6 ký tự)
-        if not new_password or len(new_password) < 6:
-            return {"status": "error", "message": "Mật khẩu mới phải có tối thiểu 6 ký tự!"}, 400
-
-        # 4. Mọi thứ hợp lệ -> Băm mật khẩu mới và lưu vào DB
+        # 3. Mọi thứ hợp lệ -> Băm mật khẩu mới và lưu vào DB
         user.password_hash = generate_password_hash(new_password)
         db.session.commit()
 

@@ -9,7 +9,7 @@ class AdminController:
     def list_all_users(current_user):
         try:
             roles = current_user.get('roles', [])
-            if 'ADMIN' not in roles:
+            if 'Admin' not in roles and 'Manager' not in roles:
                 return jsonify({'success': False, 'message': 'Không có quyền truy cập'}), 403
 
             role_code = request.args.get('role_code', '').strip() or None
@@ -38,7 +38,7 @@ class AdminController:
     @staticmethod
     def update_user_status(current_user, user_id):
         try:
-            if 'ADMIN' not in current_user.get('roles', []):
+            if 'Admin' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ Admin mới có thể thay đổi trạng thái người dùng'}), 403
 
             data = request.get_json() or {}
@@ -60,7 +60,7 @@ class AdminController:
     @staticmethod
     def assign_role(current_user, user_id):
         try:
-            if 'ADMIN' not in current_user.get('roles', []):
+            if 'Admin' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ Admin mới có thể gán role'}), 403
 
             data = request.get_json() or {}
@@ -83,7 +83,7 @@ class AdminController:
     def list_all_stores(current_user):
         try:
             roles = current_user.get('roles', [])
-            if 'ADMIN' not in roles:
+            if 'Admin' not in roles and 'Manager' not in roles:
                 return jsonify({'success': False, 'message': 'Không có quyền truy cập'}), 403
 
             status = request.args.get('status', '').strip().upper() or None
@@ -110,7 +110,7 @@ class AdminController:
     @staticmethod
     def update_store_status(current_user, store_id):
         try:
-            if 'ADMIN' not in current_user.get('roles', []):
+            if 'Admin' not in current_user.get('roles', []):
                 return jsonify({'success': False, 'message': 'Chỉ Admin mới có thể thay đổi trạng thái cửa hàng'}), 403
 
             data = request.get_json() or {}

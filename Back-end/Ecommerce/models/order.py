@@ -19,10 +19,9 @@ class Order(db.Model):
     shipping_province = db.Column(db.Unicode(100), nullable=False)
 
     payment_method = db.Column(db.String(30), nullable=False)
-    payment_status = db.Column(db.String(20), nullable=False, default='UNPAID')
     customer_note = db.Column(db.Unicode(500), nullable=True)
 
-    subtotal = db.Column('subtotal_amount', db.Numeric(18, 2), nullable=False, default=0)
+    subtotal = db.Column(db.Numeric(18, 2), nullable=False, default=0)
     discount_amount = db.Column(db.Numeric(18, 2), nullable=False, default=0)
     shipping_fee = db.Column(db.Numeric(18, 2), nullable=False, default=0)
     total_amount = db.Column(db.Numeric(18, 2), nullable=False, default=0)

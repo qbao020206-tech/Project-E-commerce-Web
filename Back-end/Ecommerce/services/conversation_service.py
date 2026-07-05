@@ -21,7 +21,7 @@ class ConversationService:
             .filter(
                 UserStore.user_id == user_id,
                 UserStore.store_member_role == 'OWNER',
-                UserStore.is_active == True
+                UserStore.is_active == 1
             )
             .first()
         )
@@ -191,7 +191,7 @@ class ConversationService:
 
             # Verify participant
             seller_store_id = None
-            if 'SELLER' in roles:
+            if 'Seller' in roles:
                 seller_store_id = ConversationService._get_seller_store_id(user_id)
 
             if not ConversationService._verify_participant(conv, user_id, seller_store_id):
@@ -265,7 +265,7 @@ class ConversationService:
 
             # Verify participant
             seller_store_id = None
-            if 'SELLER' in roles:
+            if 'Seller' in roles:
                 seller_store_id = ConversationService._get_seller_store_id(user_id)
 
             if not ConversationService._verify_participant(conv, user_id, seller_store_id):
@@ -322,7 +322,7 @@ class ConversationService:
 
             # Verify participant
             seller_store_id = None
-            if 'SELLER' in roles:
+            if 'Seller' in roles:
                 seller_store_id = ConversationService._get_seller_store_id(user_id)
 
             if not ConversationService._verify_participant(conv, user_id, seller_store_id):

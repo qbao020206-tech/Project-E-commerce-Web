@@ -218,10 +218,10 @@ class ShipmentService:
 
                     db.session.add(OrderStatusHistory(
                         order_id=order.order_id,
-                        previous_status=prev_order_status,
+                        prev_status=prev_order_status,
                         new_status='COMPLETED',
-                        changed_by_user_id=shipper_user_id,
-                        change_note='Giao hàng thành công',
+                        changed_by=shipper_user_id,
+                        note='Giao hàng thành công',
                         created_at=now
                     ))
 
@@ -231,10 +231,10 @@ class ShipmentService:
 
                     db.session.add(OrderStatusHistory(
                         order_id=order.order_id,
-                        previous_status=prev_order_status,
+                        prev_status=prev_order_status,
                         new_status='DELIVERY_FAILED',
-                        changed_by_user_id=shipper_user_id,
-                        change_note=failed_reason,
+                        changed_by=shipper_user_id,
+                        note=failed_reason,
                         created_at=now
                     ))
 

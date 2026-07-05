@@ -33,8 +33,4 @@ seller_order_bp.add_url_rule(
 )
 
 # API: Tạo mã vận đơn (Đăng ký giao hàng qua đối tác vận chuyển)
-seller_order_bp.add_url_rule(
-    '/seller/orders/<int:order_id>/shipments',
-    view_func=token_required(SellerOrderController.create_shipment),
-    methods=['POST']
-)
+seller_order_bp.route('/<int:order_id>/shipments', methods=['POST'])(token_required(SellerOrderController.create_shipment))
