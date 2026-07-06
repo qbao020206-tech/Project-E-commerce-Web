@@ -62,6 +62,10 @@ class SellerProductController:
 
             # SKU là optional — auto-generate nếu không truyền
             sku = data.get('sku', '').strip()
+            variants = data.get('variants')
+            
+            if variants is not None and not isinstance(variants, list):
+                return jsonify({'success': False, 'message': 'Variants phải là một danh sách'}), 400
 
             result, status_code = SellerProductService.create_product(
                 user_id=current_user['user_id'],
@@ -71,7 +75,8 @@ class SellerProductController:
                 description=data.get('description'),
                 price=data['price'],
                 stock_quantity=stock_quantity,
-                image_urls=data.get('image_urls', [])
+                image_urls=data.get('image_urls', []),
+                variants=variants
             )
 
             return jsonify(result), status_code
@@ -138,6 +143,29 @@ class SellerProductController:
                 limit=limit,
                 status=status,
                 keyword=keyword
+            )
+
+            return jsonify(result), status_code
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+        
+    @staticmethod
+    def update_variant(current_user, variant_id):
+        try:
+            if 'SELLER' not in current_user.get('roles', []):
+                return jsonify({'success': False, 'message': 'Chỉ người bán có thể cập nhật biến thể sản phẩm'}), 403
+
+            data = request.get_json() or {}
+            if not data:
+                return jsonify({'success': False, 'message': 'Thiếu dữ liệu cập nhật'}), 400
+
+            result, status_code = SellerProductService.update_variant(
+                user_id=current_user['user_id'],
+                variant_id=variant_id,
+                variant_name=data.get('variant_name'),
+                price=data.get('price'),
+                stock_quantity=data.get('stock_quantity'),
+                status=data.get('status')
             )
 
             return jsonify(result), status_code

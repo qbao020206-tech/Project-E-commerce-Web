@@ -9,6 +9,7 @@ class CartItem(db.Model):
     cart_id = db.Column(db.BigInteger, db.ForeignKey('carts.cart_id'), nullable=False)
     product_id = db.Column(db.BigInteger, db.ForeignKey('products.product_id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False, default=1)
+    variant_id = db.Column(db.BigInteger, db.ForeignKey('product_variants.variant_id'), nullable=False)
     # Giá tại thời điểm thêm vào giỏ — dùng để phát hiện thay đổi giá
     price_at_added = db.Column(db.Numeric(18, 2), nullable=False)
 

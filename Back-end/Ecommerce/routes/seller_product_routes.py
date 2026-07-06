@@ -10,3 +10,4 @@ seller_product_bp.add_url_rule('/products', view_func=token_required(SellerProdu
 seller_product_bp.add_url_rule('/products/<int:product_id>', view_func=token_required(SellerProductController.update_product), methods=['PATCH'])
 seller_product_bp.add_url_rule('/products/<int:product_id>', view_func=token_required(SellerProductController.delete_product), methods=['DELETE'])
 seller_product_bp.add_url_rule('/seller/products', view_func=token_required(SellerProductController.get_seller_products), methods=['GET'])
+seller_product_bp.add_url_rule('/seller/products/variants/<int:variant_id>', view_func=token_required(SellerProductController.update_variant), methods=['PATCH'])

@@ -26,9 +26,11 @@ class CartController:
                 return jsonify({'success': False, 'message': 'Chỉ khách hàng mới có thể thêm vào giỏ hàng'}), 403
 
             data = request.get_json() or {}
-
+            
             product_id = data.get('product_id')
             quantity = data.get('quantity')
+            variant_id = data.get('variant_id')
+            
 
             if not product_id or not quantity:
                 return jsonify({'success': False, 'message': 'product_id và quantity là bắt buộc'}), 400
@@ -39,7 +41,8 @@ class CartController:
             result, status_code = CartService.add_item(
                 customer_id=current_user['user_id'],
                 product_id=product_id,
-                quantity=quantity
+                quantity=quantity,
+                variant_id=variant_id
             )
             return jsonify(result), status_code
         except Exception as e:

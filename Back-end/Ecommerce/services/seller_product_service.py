@@ -1,3 +1,4 @@
+from models.cart import Cart
 from extensions import db
 from models.product import Product
 from models.product_image import ProductImage
@@ -7,6 +8,9 @@ from models.order import Order
 from models.shipment import Shipment
 from services.seller_order_service import SellerOrderService
 from models.order_status_history import OrderStatusHistory
+from models.product_variant import ProductVariant
+from models.order_item import OrderItem
+from models.cart_item import CartItem
 from sqlalchemy import func, and_
 from datetime import datetime
 from slugify import slugify
@@ -27,17 +31,44 @@ class SellerProductService:
         return query[0] if query else None
 
     @staticmethod
-    def create_product(user_id, category_id, sku, product_name, description, price, stock_quantity, image_urls):
+    def create_product(user_id, category_id, sku, product_name, description,
+                    price, stock_quantity, image_urls, variants=None):
         try:
             store_id = SellerProductService.get_seller_store(user_id)
             if not store_id:
                 return {'success': False, 'message': 'Người dùng không phải chủ cửa hàng'}, 403
 
-            # Auto-generate SKU nếu seller không truyền
+            # ─── Validate variants TRƯỚC khi tạo product (fail sớm, tránh rollback) ───
+            if variants:
+                incoming_skus = [v.get('sku_code', '').strip() for v in variants]
+
+                if any(not s for s in incoming_skus):
+                    return {'success': False, 'message': 'Mỗi variant phải có sku_code'}, 400
+
+                # Trùng SKU ngay trong chính request
+                if len(incoming_skus) != len(set(incoming_skus)):
+                    return {'success': False, 'message': 'Danh sách variants chứa SKU trùng nhau'}, 400
+
+                # Trùng SKU với variant đã có sẵn TRONG CÙNG SHOP (không check shop khác)
+                existing = db.session.query(ProductVariant.sku_code).filter(
+                    ProductVariant.store_id == store_id,
+                    ProductVariant.sku_code.in_(incoming_skus)
+                ).all()
+                if existing:
+                    dup_list = ', '.join(row[0] for row in existing)
+                    return {
+                        'success': False,
+                        'message': f'SKU đã tồn tại trong cửa hàng của bạn: {dup_list}'
+                    }, 400
+
+                for v in variants:
+                    if not isinstance(v.get('price'), (int, float)) or v['price'] <= 0:
+                        return {'success': False, 'message': f'Giá variant "{v["sku_code"]}" phải > 0'}, 400
+
+            # Auto-generate SKU cho product gốc nếu seller không truyền (giữ flow cũ)
             if not sku:
                 sku = generate_sku(product_name, store_id, db.session)
             else:
-                # Check trùng nếu seller tự nhập SKU
                 existing_sku = db.session.query(Product).filter(
                     Product.store_id == store_id,
                     Product.sku == sku
@@ -46,7 +77,6 @@ class SellerProductService:
                     return {'success': False, 'message': f'SKU "{sku}" đã tồn tại trong cửa hàng'}, 409
 
             slug = f"{slugify(product_name)}-{generate(size=6)}"
-
             utc = pytz.UTC
             now = datetime.now(utc)
 
@@ -64,7 +94,47 @@ class SellerProductService:
                 updated_at=now
             )
             db.session.add(product)
-            db.session.flush()
+            db.session.flush()  # lấy product_id trước khi tạo variant
+
+            # ─── Tạo variant(s) ───
+            created_variants = []
+            if not variants:
+                # Seller không gửi variants -> tự tạo 1 default variant từ dữ liệu product
+                default_variant = ProductVariant(
+                    product_id=product.product_id,
+                    store_id=store_id,
+                    sku_code=sku,
+                    variant_name='Mặc định',
+                    price=price,
+                    stock_quantity=stock_quantity,
+                    status='ACTIVE',
+                    is_default=True,
+                    created_at=now,
+                    updated_at=now
+                )
+                db.session.add(default_variant)
+                created_variants.append(default_variant)
+            else:
+                has_default_flag = any(v.get('is_default') for v in variants)
+                for idx, v in enumerate(variants):
+                    variant = ProductVariant(
+                        product_id=product.product_id,
+                        store_id=store_id,
+                        sku_code=v['sku_code'].strip(),
+                        variant_name=v.get('variant_name') or v['sku_code'],
+                        option1_name=v.get('option1_name'),
+                        option1_value=v.get('option1_value'),
+                        option2_name=v.get('option2_name'),
+                        option2_value=v.get('option2_value'),
+                        price=v['price'],
+                        stock_quantity=v.get('stock_quantity', 0),
+                        status='ACTIVE',
+                        is_default=v.get('is_default', False) if has_default_flag else (idx == 0),
+                        created_at=now,
+                        updated_at=now
+                    )
+                    db.session.add(variant)
+                    created_variants.append(variant)
 
             if image_urls:
                 for idx, url in enumerate(image_urls):
@@ -82,30 +152,27 @@ class SellerProductService:
 
             db.session.commit()
 
-            images = []
-            if image_urls:
-                for idx, url in enumerate(image_urls):
-                    images.append({
-                        'image_url': url,
-                        'is_primary': idx == 0
-                    })
-
             return {
                 'success': True,
                 'data': {
                     'product_id': product.product_id,
                     'product_name': product.product_name,
                     'slug': product.slug,
-                    'price': float(product.price),
-                    'stock_quantity': product.stock_quantity,
                     'status': product.status,
-                    'images': images
+                    'variants': [{
+                        'variant_id': v.variant_id,
+                        'sku_code': v.sku_code,
+                        'variant_name': v.variant_name,
+                        'price': float(v.price),
+                        'stock_quantity': v.stock_quantity,
+                        'is_default': v.is_default
+                    } for v in created_variants]
                 }
             }, 201
         except Exception as e:
             db.session.rollback()
             raise e
-
+    
     @staticmethod
     def update_product(user_id, product_id, category_id=None, product_name=None, description=None, price=None, stock_quantity=None, status=None):
         try:
@@ -349,3 +416,55 @@ class SellerProductService:
         # Sinh mã giả lập y hệt chuẩn mã của Giao Hàng Tiết Kiệm (GHTK): VD: GHTK-837492103
         random_code = ''.join(random.choices(string.digits, k=9))
         return f"GHTK-{random_code}"
+    
+@staticmethod
+def update_item_qty(customer_id, cart_item_id, quantity):
+    try:
+        if quantity < 1:
+            return {'success': False, 'message': 'Số lượng phải >= 1'}, 400
+
+        cart = db.session.query(Cart).filter(
+            Cart.customer_id == customer_id,
+            Cart.status == 'ACTIVE'
+        ).first()
+
+        if not cart:
+            return {'success': False, 'message': 'Giỏ hàng không tồn tại'}, 404
+
+        item = db.session.query(CartItem).filter(
+            CartItem.cart_item_id == cart_item_id,
+            CartItem.cart_id == cart.cart_id
+        ).first()
+
+        if not item:
+            return {'success': False, 'message': 'Không tìm thấy sản phẩm trong giỏ hàng'}, 404
+
+        variant = db.session.query(ProductVariant).filter(
+            ProductVariant.variant_id == item.variant_id
+        ).first()
+
+        if not variant or variant.stock_quantity < quantity:
+            stock = variant.stock_quantity if variant else 0
+            return {
+                'success': False,
+                'message': f'Không đủ hàng trong kho. Tồn kho: {stock}'
+            }, 400
+
+        item.quantity = quantity
+        item.updated_at = datetime.now(pytz.UTC)
+        db.session.commit()
+
+        return {
+            'success': True,
+            'data': {
+                'cart_item_id': item.cart_item_id,
+                'product_id': item.product_id,
+                'variant_id': item.variant_id,
+                'quantity': item.quantity,
+                'price_at_added': float(item.price_at_added),
+            }
+        }, 200
+
+    except Exception as e:
+        db.session.rollback()
+        raise e
